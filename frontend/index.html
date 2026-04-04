@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Collaborative Editing System</title>
+</head>
+<body>
+    <h3>Nhập nội dung:</h3>
+    <textarea id="input" rows="10" cols="50" style="width: 100%;"></textarea>
+    <h3>Kết quả đồng bộ:</h3>
+    <div id="output" style="border: 1px solid #ccc; padding: 10px; min-height: 100px; background: #f9f9f9;"></div>
+
+    <script type="module">
+        import * as Y from 'https://esm.sh/yjs';
+        import { WebsocketProvider } from 'https://esm.sh/y-websocket';
+
+        // Khởi tạo tài liệu Yjs 
+        const doc = new Y.Doc();
+        
+        // Kết nối tới server tại localhost:1234 
+        const provider = new WebsocketProvider('ws://localhost:1234', 'my-doc', doc);
+        
+        const yText = doc.getText('content');
+
+        // Cập nhật giao diện khi có thay đổi từ người khác 
+        yText.observe(() => {
+            document.getElementById('output').innerText = yText.toString();
+        });
+
+        // Gửi thay đổi của mình lên hệ thống 
+        document.getElementById('input').addEventListener('input', (e) => {
+            yText.delete(0, yText.length);
+            yText.insert(0, e.target.value);
+        });
+    </script>
+</body>
+</html>
