@@ -7,9 +7,8 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const Y = require('yjs');
 
-// ==========================================
+
 // YJS DOCUMENTS IN MEMORY
-// ==========================================
 const docs = new Map();
 
 function getYDoc(docId) {
@@ -29,6 +28,8 @@ const io = new Server(server, {
 });
 
 const crypto = require('crypto');
+const e = require('express');
+const { error } = require('console');
 const generateInviteCode = () => crypto.randomBytes(4).toString('hex').toUpperCase();
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,15 +40,13 @@ function isValidUUID(str) {
 app.use(cors());
 app.use(express.json());
 
-// ==========================================
+
 // PRESENCE: userId → socketId (in-memory)
 // Dùng để push real-time notification kết bạn
-// ==========================================
 const onlineSocketMap = new Map(); // userId (UUID string) → socket.id
 
-// ==========================================
+
 // MIDDLEWARE XÁC THỰC
-// ==========================================
 function requireAuth(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Bạn chưa đăng nhập' });
@@ -60,9 +59,8 @@ function requireAuth(req, res, next) {
     }
 }
 
-// ==========================================
+
 // RATE LIMITING
-// ==========================================
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -83,9 +81,8 @@ const friendLimiter = rateLimit({
     message: { error: 'Quá nhiều yêu cầu. Vui lòng chờ một chút.' }
 });
 
-// ==========================================
+
 // ROUTES XÁC THỰC (AUTH)
-// ==========================================
 app.post('/auth/register', registerLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -125,9 +122,8 @@ app.post('/auth/login', loginLimiter, async (req, res) => {
     }
 });
 
-// ==========================================
+
 // ROUTES QUẢN LÝ TÀI LIỆU (giữ nguyên)
-// ==========================================
 app.get('/api/documents', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -255,10 +251,8 @@ app.delete('/api/documents/:id/leave', requireAuth, async (req, res) => {
     }
 });
 
-// ==========================================
-// ROUTES KẾT BẠN
-// ==========================================
 
+// ROUTES KẾT BẠN
 // Tìm kiếm user theo email (loại bỏ chính mình và bạn đã có)
 app.get('/api/users/search', requireAuth, friendLimiter, async (req, res) => {
     try {
@@ -443,9 +437,8 @@ app.delete('/api/friends/:id', requireAuth, async (req, res) => {
     }
 });
 
-// ==========================================
+
 // SOCKET.IO — xác thực + presence + yjs
-// ==========================================
 const saveTimers = {};
 
 io.use((socket, next) => {
@@ -469,7 +462,7 @@ io.on('connection', (socket) => {
     // Notify bạn bè rằng mình online
     notifyFriendsPresence(userId, true);
 
-    // ── JOIN DOCUMENT ──
+    //  JOIN DOCUMENT 
     socket.on('join-document', async (docId, userEmail) => {
         if (!isValidUUID(docId)) {
             socket.emit('error', 'ID tài liệu không hợp lệ');
@@ -512,7 +505,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ── YJS UPDATE ──
+    //  YJS UPDATE
     socket.on('yjs-update', async (docId, update) => {
         if (!isValidUUID(docId)) return;
         const roomName = `doc-${docId}`;
@@ -539,14 +532,14 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ── MỜI BẠN BÈ VÀO TÀI LIỆU ──
+    //  MỜI BẠN BÈ VÀO TÀI LIỆU 
     socket.on('doc:invite-friend', async ({ docId, friendId }) => {
-        // ── DEBUG ──
+        // Dùng cho DEBUG 
         console.log('[invite] docId:', docId);
         console.log('[invite] friendId received:', JSON.stringify(friendId));
         console.log('[invite] onlineSocketMap keys:', [...onlineSocketMap.keys()].map(k => JSON.stringify(k)));
         console.log('[invite] map has friendId?', onlineSocketMap.has(String(friendId)));
-        // ── END DEBUG ──
+        //  END DEBUG
 
         if (!isValidUUID(docId) || !isValidUUID(String(friendId))) {
             console.log('[invite] UUID invalid — docId valid:', isValidUUID(docId), '| friendId valid:', isValidUUID(String(friendId)));
@@ -611,7 +604,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ── CHẤP NHẬN LỜI MỜI VÀO DOC ──
+    //  CHẤP NHẬN LỜI MỜI VÀO DOC
     socket.on('doc:invite-accept', async ({ docId, inviterId }) => {
         if (!isValidUUID(docId)) return;
 
@@ -634,15 +627,20 @@ io.on('connection', (socket) => {
         socket.emit('doc:invite-join', { docId });
     });
 
-    // ── DISCONNECT ──
+    //  DISCONNECT
     socket.on('disconnect', async () => {
         onlineSocketMap.delete(String(userId));
         notifyFriendsPresence(userId, false);
 
         if (socket.docId) {
             const roomName = `doc-${socket.docId}`;
-            const socketsInRoom = await io.in(roomName).fetchSockets();
-            io.to(roomName).emit('update-users', socketsInRoom.map(s => s.userEmail).filter(Boolean));
+
+            setTimeout(async () => {
+                const socketsInRoom = await io.in(roomName).fetchSockets();
+                io.to(roomName).emit('update-users',
+                    socketsInRoom.map(s => s.userEmail).filter(Boolean)
+                );
+            }, 100);
         }
     });
 });
