@@ -1,6 +1,11 @@
-/* style.css — chỉ giữ override Quill, Bootstrap lo phần còn lại */
+/*
+   style.css — CES Collaborative Editor System
+   Bao gồm: Quill overrides, layout chính (index), trang login
+*/
 
-/* Quill editor - remove all default borders to blend with layout */
+/*
+   1. QUILL EDITOR — override mặc định để blend với layout
+*/
 .ql-toolbar.ql-snow {
     border: none !important;
     border-bottom: 1px solid #dee2e6 !important;
@@ -21,3 +26,247 @@
     color: #adb5bd;
     font-style: normal;
 }
+
+/*
+   2. APP SHELL — layout tổng thể (index.html)
+*/
+html, body { height: 100%; overflow: hidden; background: #f8f9fa; }
+.app-shell { display: flex; flex-direction: column; height: 100vh; }
+
+/* Navbar */
+.ces-navbar {
+    height: 54px; background: #fff; border-bottom: 1px solid #dee2e6;
+    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+    flex-shrink: 0; z-index: 100;
+}
+.ces-brand {
+    font-weight: 700; font-size: 1.1rem; color: #0d6efd;
+    letter-spacing: -.5px; white-space: nowrap;
+}
+
+/* Body */
+.ces-body { display: flex; flex: 1; overflow: hidden; }
+
+/*
+   3. SIDEBAR TRÁI
+*/
+.ces-sidebar {
+    width: 250px; background: #fff; border-right: 1px solid #dee2e6;
+    display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.ces-sidebar-header {
+    padding: 10px; border-bottom: 1px solid #dee2e6;
+    display: flex; flex-direction: column; gap: 5px;
+}
+
+/* Danh sách tài liệu */
+.doc-list { list-style: none; padding: 6px 5px; margin: 0; overflow-y: auto; flex: 1; }
+.doc-item {
+    border-radius: 7px; padding: 7px 8px; margin-bottom: 2px;
+    cursor: pointer; font-size: 13px; border: 1px solid transparent; transition: background .12s;
+}
+.doc-item:hover { background: #e9f0ff; }
+.doc-item.active { background: #dbeafe; border-color: #bfdbfe; font-weight: 600; }
+.doc-item-row { display: flex; align-items: center; gap: 5px; }
+.doc-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-item-badge {
+    font-size: 9px; padding: 1px 5px; border-radius: 99px;
+    font-weight: 600; flex-shrink: 0;
+}
+.doc-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.doc-item-actions button {
+    background: none; border: none; padding: 2px 5px; border-radius: 4px;
+    cursor: pointer; font-size: 12px; color: #6c757d; line-height: 1;
+}
+.doc-item-actions button:hover { background: #f1f3f5; color: #dc3545; }
+
+/* Mã mời */
+.doc-invite-code { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.invite-code-text {
+    font-family: monospace; font-size: 11px; background: #f1f3f5;
+    padding: 1px 6px; border-radius: 4px; letter-spacing: 1px; color: #495057;
+}
+
+/*
+   4. KHU VỰC EDITOR
+*/
+.ces-editor { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
+#editor { flex: 1; overflow-y: auto; font-size: 15px; }
+.ql-toolbar {
+    border-left: none !important; border-right: none !important;
+    border-top: none !important; background: #fafafa;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+.ql-container { border: none !important; }
+
+/*
+   5. PANEL PHẢI (Online / Bạn bè)
+*/
+.ces-right {
+    width: 230px; background: #fff; border-left: 1px solid #dee2e6;
+    display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.rp-tabs { display: flex; border-bottom: 1px solid #dee2e6; flex-shrink: 0; }
+.rp-tab {
+    flex: 1; padding: 10px 4px; background: none;
+    border: none; border-bottom: 2px solid transparent;
+    font-size: 12px; font-weight: 600; color: #6c757d; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    transition: color .15s, border-color .15s;
+}
+.rp-tab:hover { color: #0d6efd; }
+.rp-tab.active { color: #0d6efd; border-bottom-color: #0d6efd; }
+.rp-panel { flex: 1; overflow-y: auto; padding: 10px; }
+.rp-panel.hidden { display: none; }
+
+/* Người dùng online */
+.online-user-item { display: flex; align-items: center; gap: 8px; padding: 4px 2px; font-size: 12px; }
+.online-dot { width: 8px; height: 8px; border-radius: 50%; background: #198754; flex-shrink: 0; }
+.panel-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: #adb5bd; padding: 8px 2px 4px;
+}
+
+/*
+   6. COMPONENT BẠN BÈ
+*/
+.friend-search-row { display: flex; gap: 5px; margin-bottom: 8px; }
+.friend-search-row input {
+    flex: 1; min-width: 0; font-size: 12px; padding: 5px 9px;
+    border: 1px solid #dee2e6; border-radius: 6px; outline: none;
+}
+.friend-search-row input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13,110,253,.15);
+}
+.friend-search-row button {
+    padding: 5px 9px; border: 1px solid #dee2e6;
+    border-radius: 6px; background: #f8f9fa; cursor: pointer; font-size: 12px;
+}
+.friend-search-row button:hover { background: #e9ecef; }
+
+.friend-list { list-style: none; padding: 0; margin: 0 0 6px; display: flex; flex-direction: column; gap: 2px; }
+.friend-item { display: flex; align-items: center; gap: 7px; padding: 5px 4px; border-radius: 6px; font-size: 12px; }
+.friend-item:hover { background: #f8f9fa; }
+
+.friend-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: #0d6efd; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.friend-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.friend-email { font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #212529; }
+.friend-status { font-size: 10px; font-weight: 500; }
+.status-online  { color: #198754; }
+.status-offline { color: #adb5bd; }
+.hidden { display: none !important; }
+
+.friend-actions { display: flex; gap: 3px; flex-shrink: 0; }
+.friend-actions button {
+    background: none; border: 1px solid #dee2e6; border-radius: 5px;
+    padding: 2px 6px; font-size: 11px; cursor: pointer; font-weight: 600; transition: all .12s;
+}
+.btn-fa-accept   { color: #198754; border-color: #a3cfbb; background: #f0fdf4; }
+.btn-fa-accept:hover   { background: #198754; color: #fff; border-color: #198754; }
+.btn-fa-decline  { color: #6c757d; }
+.btn-fa-decline:hover  { background: #fee2e2; color: #dc3545; border-color: #dc3545; }
+.btn-fa-add      { color: #0d6efd; border-color: #93c5fd; background: #eff6ff; }
+.btn-fa-add:hover      { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+.btn-fa-invite   { color: #198754; border-color: #a3cfbb; background: #f0fdf4; }
+.btn-fa-invite:hover   { background: #198754; color: #fff; border-color: #198754; }
+.btn-fa-unfriend { color: #adb5bd; }
+.btn-fa-unfriend:hover { background: #fee2e2; color: #dc3545; border-color: #dc3545; }
+
+.friend-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+.tag-friend { background: #d1fae5; color: #065f46; }
+.tag-sent   { background: #fef9c3; color: #854d0e; }
+.friend-empty { font-size: 11px; color: #adb5bd; font-style: italic; padding: 4px 2px; }
+
+/* 
+   7. STATUS BAR
+*/
+.ces-statusbar {
+    height: 26px; background: #fff; border-top: 1px solid #dee2e6;
+    display: flex; align-items: center; padding: 0 14px;
+    font-size: 11px; color: #6c757d; flex-shrink: 0;
+}
+
+/*
+   8. POPUP MỜI VÀO TÀI LIỆU
+*/
+.doc-invite-popup {
+    position: fixed; bottom: 50px; right: 20px; z-index: 1050;
+    animation: slideUp .2s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(14px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+.doc-invite-card {
+    background: #fff; border: 1px solid #dee2e6; border-left: 4px solid #0d6efd;
+    border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.14);
+    padding: 14px 16px; width: 290px;
+}
+
+/*
+   9. TOAST THÔNG BÁO
+*/
+.ces-toast {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+    padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 1055;
+    pointer-events: none; opacity: 0; transition: opacity .25s; white-space: nowrap;
+}
+.ces-toast.show { opacity: 1; }
+.ces-toast.ok   { background: #0d6efd; color: #fff; }
+.ces-toast.err  { background: #dc3545; color: #fff; }
+
+/*
+   10. TRANG ĐĂNG NHẬP / ĐĂNG KÝ (login.html)
+*/
+.auth-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0eaff 0%, #f0e6ff 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+.auth-card {
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.10);
+    padding: 40px 36px; width: 100%; max-width: 380px;
+}
+.auth-brand {
+    font-size: 1.6rem; font-weight: 800; color: #0d6efd; letter-spacing: -1px;
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+    margin-bottom: 4px;
+}
+.auth-sub { text-align: center; color: #6c757d; font-size: 13px; margin-bottom: 24px; }
+
+/* Tab thanh chuyển đổi */
+.auth-tab-bar {
+    display: flex; background: #f1f3f5; border-radius: 8px;
+    padding: 4px; gap: 4px; margin-bottom: 20px;
+}
+.auth-tab {
+    flex: 1; padding: 7px; border: none; background: transparent;
+    border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
+    color: #6c757d; transition: all .2s;
+}
+.auth-tab.active { background: #fff; color: #0d6efd; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+/* Form inputs */
+.auth-card .form-control { font-size: 14px; padding: 10px 12px; }
+.auth-card .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+}
+
+/* Nút submit */
+.btn-auth {
+    width: 100%; padding: 11px; font-size: 15px; font-weight: 600;
+    border-radius: 8px; margin-top: 4px;
+}
+
+/* Dòng chuyển mode */
+.auth-switch { text-align: center; margin-top: 18px; font-size: 13px; color: #6c757d; }
+.auth-switch a { color: #0d6efd; font-weight: 600; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }

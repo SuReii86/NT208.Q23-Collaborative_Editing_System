@@ -4,164 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CES — Collaborative Editor</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Quill editor CSS -->
     <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css">
-    <style>
-        html, body { height: 100%; overflow: hidden; background: #f8f9fa; }
-        .app-shell { display: flex; flex-direction: column; height: 100vh; }
-
-        /* Navbar */
-        .ces-navbar {
-            height: 54px; background: #fff; border-bottom: 1px solid #dee2e6;
-            display: flex; align-items: center; padding: 0 16px; gap: 12px;
-            flex-shrink: 0; z-index: 100;
-        }
-        .ces-brand { font-weight: 700; font-size: 1.1rem; color: #0d6efd; letter-spacing: -.5px; white-space: nowrap; }
-
-        /* Body */
-        .ces-body { display: flex; flex: 1; overflow: hidden; }
-
-        /* Left sidebar */
-        .ces-sidebar {
-            width: 250px; background: #fff; border-right: 1px solid #dee2e6;
-            display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
-        }
-        .ces-sidebar-header { padding: 10px; border-bottom: 1px solid #dee2e6; display: flex; flex-direction: column; gap: 5px; }
-        .doc-list { list-style: none; padding: 6px 5px; margin: 0; overflow-y: auto; flex: 1; }
-        .doc-item {
-            border-radius: 7px; padding: 7px 8px; margin-bottom: 2px;
-            cursor: pointer; font-size: 13px; border: 1px solid transparent; transition: background .12s;
-        }
-        .doc-item:hover { background: #e9f0ff; }
-        .doc-item.active { background: #dbeafe; border-color: #bfdbfe; font-weight: 600; }
-        .doc-item-row { display: flex; align-items: center; gap: 5px; }
-        .doc-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .doc-item-badge { font-size: 9px; padding: 1px 5px; border-radius: 99px; font-weight: 600; flex-shrink: 0; }
-        .doc-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
-        .doc-item-actions button {
-            background: none; border: none; padding: 2px 5px; border-radius: 4px;
-            cursor: pointer; font-size: 12px; color: #6c757d; line-height: 1;
-        }
-        .doc-item-actions button:hover { background: #f1f3f5; color: #dc3545; }
-        .doc-invite-code { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .invite-code-text {
-            font-family: monospace; font-size: 11px; background: #f1f3f5;
-            padding: 1px 6px; border-radius: 4px; letter-spacing: 1px; color: #495057;
-        }
-
-        /* Editor */
-        .ces-editor { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
-        #editor { flex: 1; overflow-y: auto; font-size: 15px; }
-        .ql-toolbar {
-            border-left: none !important; border-right: none !important;
-            border-top: none !important; background: #fafafa;
-            border-bottom: 1px solid #dee2e6 !important;
-        }
-        .ql-container { border: none !important; }
-
-        /* Right panel */
-        .ces-right {
-            width: 230px; background: #fff; border-left: 1px solid #dee2e6;
-            display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
-        }
-        .rp-tabs { display: flex; border-bottom: 1px solid #dee2e6; flex-shrink: 0; }
-        .rp-tab {
-            flex: 1; padding: 10px 4px; background: none;
-            border: none; border-bottom: 2px solid transparent;
-            font-size: 12px; font-weight: 600; color: #6c757d; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-            transition: color .15s, border-color .15s;
-        }
-        .rp-tab:hover { color: #0d6efd; }
-        .rp-tab.active { color: #0d6efd; border-bottom-color: #0d6efd; }
-        .rp-panel { flex: 1; overflow-y: auto; padding: 10px; }
-        .rp-panel.hidden { display: none; }
-
-        .online-user-item { display: flex; align-items: center; gap: 8px; padding: 4px 2px; font-size: 12px; }
-        .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #198754; flex-shrink: 0; }
-        .panel-label { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #adb5bd; padding: 8px 2px 4px; }
-
-        /* Friend components */
-        .friend-search-row { display: flex; gap: 5px; margin-bottom: 8px; }
-        .friend-search-row input {
-            flex: 1; min-width: 0; font-size: 12px; padding: 5px 9px;
-            border: 1px solid #dee2e6; border-radius: 6px; outline: none;
-        }
-        .friend-search-row input:focus { border-color: #0d6efd; box-shadow: 0 0 0 2px rgba(13,110,253,.15); }
-        .friend-search-row button { padding: 5px 9px; border: 1px solid #dee2e6; border-radius: 6px; background: #f8f9fa; cursor: pointer; font-size: 12px; }
-        .friend-search-row button:hover { background: #e9ecef; }
-
-        .friend-list { list-style: none; padding: 0; margin: 0 0 6px; display: flex; flex-direction: column; gap: 2px; }
-        .friend-item { display: flex; align-items: center; gap: 7px; padding: 5px 4px; border-radius: 6px; font-size: 12px; }
-        .friend-item:hover { background: #f8f9fa; }
-        .friend-avatar {
-            width: 26px; height: 26px; border-radius: 50%; background: #0d6efd; color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700; flex-shrink: 0;
-        }
-        .friend-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-        .friend-email { font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #212529; }
-        .friend-status { font-size: 10px; font-weight: 500; }
-        .status-online { color: #198754; }
-        .status-offline { color: #adb5bd; }
-        .friend-actions { display: flex; gap: 3px; flex-shrink: 0; }
-        .friend-actions button {
-            background: none; border: 1px solid #dee2e6; border-radius: 5px;
-            padding: 2px 6px; font-size: 11px; cursor: pointer; font-weight: 600; transition: all .12s;
-        }
-        .btn-fa-accept  { color: #198754; border-color: #a3cfbb; background: #f0fdf4; }
-        .btn-fa-accept:hover  { background: #198754; color: #fff; border-color: #198754; }
-        .btn-fa-decline { color: #6c757d; }
-        .btn-fa-decline:hover { background: #fee2e2; color: #dc3545; border-color: #dc3545; }
-        .btn-fa-add     { color: #0d6efd; border-color: #93c5fd; background: #eff6ff; }
-        .btn-fa-add:hover     { background: #0d6efd; color: #fff; border-color: #0d6efd; }
-        .btn-fa-invite  { color: #198754; border-color: #a3cfbb; background: #f0fdf4; }
-        .btn-fa-invite:hover  { background: #198754; color: #fff; border-color: #198754; }
-        .btn-fa-unfriend { color: #adb5bd; }
-        .btn-fa-unfriend:hover { background: #fee2e2; color: #dc3545; border-color: #dc3545; }
-        .friend-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
-        .tag-friend { background: #d1fae5; color: #065f46; }
-        .tag-sent   { background: #fef9c3; color: #854d0e; }
-        .friend-empty { font-size: 11px; color: #adb5bd; font-style: italic; padding: 4px 2px; }
-
-        /* Status bar */
-        .ces-statusbar {
-            height: 26px; background: #fff; border-top: 1px solid #dee2e6;
-            display: flex; align-items: center; padding: 0 14px;
-            font-size: 11px; color: #6c757d; flex-shrink: 0;
-        }
-
-        /* Doc invite popup */
-        .doc-invite-popup {
-            position: fixed; bottom: 50px; right: 20px; z-index: 1050;
-            animation: slideUp .2s ease;
-        }
-        @keyframes slideUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .doc-invite-card {
-            background: #fff; border: 1px solid #dee2e6; border-left: 4px solid #0d6efd;
-            border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.14); padding: 14px 16px; width: 290px;
-        }
-
-        /* Toast */
-        .ces-toast {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
-            box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 1055;
-            pointer-events: none; opacity: 0; transition: opacity .25s; white-space: nowrap;
-        }
-        .ces-toast.show { opacity: 1; }
-        .ces-toast.ok  { background: #0d6efd; color: #fff; }
-        .ces-toast.err { background: #dc3545; color: #fff; }
-    </style>
+    <!-- CSS chung của ứng dụng -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <div class="app-shell">
 
     <!-- NAVBAR -->
     <header class="ces-navbar">
-        <span class="ces-brand"><i class="bi bi-file-earmark-text-fill me-1"></i>CES</span>
+        <span class="ces-brand">
+            <i class="bi bi-file-earmark-text-fill me-1"></i>CES
+        </span>
         <div class="flex-grow-1"></div>
+        <!-- Sẽ được điền bởi app.js sau khi xác thực -->
         <div id="auth-section">
             <a href="login.html" class="btn btn-sm btn-primary">Đăng nhập</a>
         </div>
@@ -169,7 +32,7 @@
 
     <div class="ces-body">
 
-        <!-- LEFT SIDEBAR -->
+        <!-- SIDEBAR TRÁI -->
         <aside class="ces-sidebar">
             <div class="ces-sidebar-header">
                 <button class="btn btn-primary btn-sm w-100" id="btn-create-doc">
@@ -179,409 +42,85 @@
                     <i class="bi bi-key me-1"></i>Nhập mã mời
                 </button>
             </div>
+            <!-- Danh sách tài liệu — điền bởi app.js -->
             <ul class="doc-list" id="doc-list"></ul>
         </aside>
 
         <!-- EDITOR -->
         <main class="ces-editor">
+            <!-- Quill sẽ gắn vào div#editor -->
             <div id="editor"></div>
         </main>
 
-        <!-- RIGHT PANEL -->
+        <!-- PANEL PHẢI -->
         <aside class="ces-right">
+
+            <!-- Tabs Online / Bạn bè -->
             <div class="rp-tabs">
                 <button class="rp-tab active" data-tab="online">
-                    <i class="bi bi-circle-fill text-success" style="font-size:7px;"></i>Trực tuyến
+                    <i class="bi bi-circle-fill text-success" style="font-size:7px;"></i>
+                    Trực tuyến
                 </button>
                 <button class="rp-tab" data-tab="friends">
                     <i class="bi bi-people"></i>Bạn bè
-                    <span id="pending-badge" class="badge bg-danger hidden" style="font-size:9px;padding:2px 5px;">0</span>
+                    <span id="pending-badge" class="badge bg-danger hidden"
+                          style="font-size:9px;padding:2px 5px;">0</span>
                 </button>
             </div>
 
+            <!-- Tab: Người đang online -->
             <div id="tab-online" class="rp-panel">
                 <div class="panel-label">Đang soạn thảo</div>
                 <div id="user-list"></div>
             </div>
 
+            <!-- Tab: Bạn bè -->
             <div id="tab-friends" class="rp-panel hidden">
+                <!-- Tìm kiếm người dùng -->
                 <div class="friend-search-row">
-                    <input id="friend-search-input" type="text" placeholder="Tìm email…" autocomplete="off">
-                    <button id="btn-friend-search"><i class="bi bi-search"></i></button>
+                    <input id="friend-search-input" type="text"
+                           placeholder="Tìm email…" autocomplete="off">
+                    <button id="btn-friend-search">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </div>
                 <ul id="search-results" class="friend-list"></ul>
 
+                <!-- Lời mời kết bạn đang chờ -->
                 <div class="panel-label" id="pending-label" style="display:none;">
                     <i class="bi bi-bell-fill text-warning me-1"></i>Lời mời kết bạn
                 </div>
                 <ul id="pending-list" class="friend-list"></ul>
 
-                <div class="panel-label"><i class="bi bi-people me-1"></i>Bạn bè của tôi</div>
+                <!-- Danh sách bạn bè -->
+                <div class="panel-label">
+                    <i class="bi bi-people me-1"></i>Bạn bè của tôi
+                </div>
                 <ul id="friend-list" class="friend-list"></ul>
             </div>
+
         </aside>
     </div>
 
+    <!-- STATUS BAR -->
     <footer class="ces-statusbar">
-        <span id="save-status"><i class="bi bi-wifi me-1"></i>Đang kết nối...</span>
+        <span id="save-status">
+            <i class="bi bi-wifi me-1"></i>Đang kết nối...
+        </span>
     </footer>
+
 </div>
 
+<!-- Toast thông báo toàn cục -->
 <div id="ces-toast" class="ces-toast"></div>
 
+<!-- SCRIPTS -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Socket.IO client -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script type="module">
-    import * as Y from 'https://esm.sh/yjs@13.6.15';
-    import { QuillBinding } from 'https://esm.sh/y-quill@0.1.5?deps=yjs@13.6.15';
-    import Quill from 'https://esm.sh/quill@1.3.7';
+<!-- Logic chính của ứng dụng (ES Module vì dùng import Yjs / Quill) -->
+<script type="module" src="app.js"></script>
 
-    // 1. Auth
-    const token     = localStorage.getItem('ces_token');
-    const userEmail = localStorage.getItem('ces_email');
-    if (!token) { window.location.href = 'login.html'; }
-    const myUserId  = token ? JSON.parse(atob(token.split('.')[1])).userId : null;
-    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const rawDocId   = new URLSearchParams(window.location.search).get('id');
-    const docId      = (rawDocId && UUID_REGEX.test(rawDocId)) ? rawDocId : null;
-    if (rawDocId && !docId) window.location.search = '';
-
-    // Utils
-    function showToast(msg, isError = false) {
-        const el = document.getElementById('ces-toast');
-        el.textContent = msg;
-        el.className = `ces-toast ${isError ? 'err' : 'ok'} show`;
-        clearTimeout(window._tt);
-        window._tt = setTimeout(() => el.classList.remove('show'), 3200);
-    }
-    async function apiFetch(url, opts = {}) {
-        const res = await fetch(`http://localhost:5000${url}`, {
-            ...opts,
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
-        });
-        if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
-        return res;
-    }
-    function setStatus(msg, icon = 'bi-check2-circle') {
-        document.getElementById('save-status').innerHTML = `<i class="bi ${icon} me-1"></i>${msg}`;
-    }
-
-    // 2. Document list
-    async function loadDocumentList() {
-        try {
-            const res = await apiFetch('/api/documents');
-            if (!res.ok) return;
-            const docs = await res.json();
-            const ul = document.getElementById('doc-list');
-            if (!docs.length) {
-                ul.innerHTML = `<li class="friend-empty ps-1 pt-2">Chưa có tài liệu nào</li>`;
-                return;
-            }
-            ul.innerHTML = docs.map(doc => {
-                const isOwner  = doc.owner_id === myUserId;
-                const isActive = doc.id === docId;
-                return `
-                <li class="doc-item${isActive ? ' active' : ''}" data-doc-id="${doc.id}">
-                    <div class="doc-item-row">
-                        <i class="bi bi-file-earmark-text text-primary" style="font-size:14px;flex-shrink:0;"></i>
-                        <span class="doc-item-name">${doc.title || 'Tài liệu không tên'}</span>
-                        <span class="doc-item-badge ${isOwner ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary'}">
-                            ${isOwner ? 'Owner' : 'Shared'}
-                        </span>
-                        <div class="doc-item-actions">
-                            ${isOwner
-                                ? `<button onclick="event.stopPropagation();startRename('${doc.id}',this)"
-                                        data-title="${(doc.title||'').replace(/"/g,'&quot;')}" title="Đổi tên">
-                                        <i class="bi bi-pencil"></i></button>`
-                                : `<button data-action="leave-doc" data-doc-id="${doc.id}"
-                                        title="Rời tài liệu" style="color:#dc3545;">
-                                        <i class="bi bi-box-arrow-right"></i></button>`
-                            }
-                        </div>
-                    </div>
-                    ${isOwner ? `
-                    <div class="doc-invite-code">
-                        <i class="bi bi-key text-secondary" style="font-size:11px;"></i>
-                        <span class="invite-code-text">${doc.invite_code||'---'}</span>
-                        <button onclick="event.stopPropagation();copyCode('${doc.invite_code}')"
-                            class="btn btn-link btn-sm p-0" style="font-size:11px;" title="Sao chép">
-                            <i class="bi bi-clipboard"></i></button>
-                    </div>` : ''}
-                </li>`;
-            }).join('');
-        } catch(e) { console.error(e); }
-    }
-
-    document.getElementById('doc-list').addEventListener('click', async (e) => {
-        const leaveBtn = e.target.closest('[data-action="leave-doc"]');
-        if (leaveBtn) {
-            e.stopPropagation();
-            const id = leaveBtn.dataset.docId;
-            if (!confirm('Rời tài liệu này? Bạn sẽ mất quyền truy cập.')) return;
-            const res  = await apiFetch(`/api/documents/${id}/leave`, { method: 'DELETE' });
-            const data = await res.json();
-            if (res.ok) { showToast('Đã rời tài liệu'); id === docId ? (window.location.href = 'index.html') : loadDocumentList(); }
-            else showToast(data.error || 'Không thể rời tài liệu', true);
-            return;
-        }
-        if (e.target.closest('[onclick]')) return;
-        const li = e.target.closest('.doc-item[data-doc-id]');
-        if (li) window.location.href = `?id=${li.dataset.docId}`;
-    });
-
-    async function startRename(id, btn) {
-        const t = prompt('Nhập tên mới:', btn.getAttribute('data-title'));
-        if (!t || t.trim() === btn.getAttribute('data-title')) return;
-        const res = await apiFetch(`/api/documents/${id}/rename`, { method: 'PATCH', body: JSON.stringify({ title: t.trim() }) });
-        const d = await res.json();
-        res.ok ? loadDocumentList() : showToast(d.error||'Lỗi', true);
-    }
-    function copyCode(code) {
-        if (!code || code === 'undefined') return;
-        navigator.clipboard.writeText(code).then(() => showToast(`✅ Đã sao chép: ${code}`));
-    }
-    window.startRename = startRename;
-    window.copyCode    = copyCode;
-    loadDocumentList();
-
-    // 3. Editor
-    const ydoc  = new Y.Doc();
-    const ytext = ydoc.getText('content');
-    const quill = new Quill('#editor', { theme: 'snow', placeholder: 'Bắt đầu soạn thảo cùng đồng nghiệp...' });
-    let binding = null;
-    quill.disable();
-
-    // 4. Socket
-    const socket = io('http://localhost:5000', { auth: { token } });
-
-    socket.on('connect', () => {
-        setStatus('Đã kết nối', 'bi-wifi');
-        if (docId) { socket.emit('join-document', docId, userEmail); quill.enable(); }
-        else setStatus('Chọn hoặc tạo tài liệu', 'bi-arrow-left-circle');
-        loadFriendList(); loadPendingRequests();
-    });
-    socket.on('disconnect',    () => { setStatus('Mất kết nối...', 'bi-wifi-off'); quill.disable(); });
-    socket.on('connect_error', (e) => {
-        if (e.message === 'Unauthorized') { localStorage.clear(); window.location.href = 'login.html'; }
-        setStatus('Lỗi kết nối', 'bi-exclamation-circle');
-    });
-
-    // 5. Yjs
-    ydoc.on('update', (u, origin) => {
-        if (origin !== socket && docId) { socket.emit('yjs-update', docId, Array.from(u)); setStatus('Đang lưu...', 'bi-arrow-repeat'); }
-    });
-    socket.on('yjs-update', (u) => Y.applyUpdate(ydoc, new Uint8Array(u), socket));
-    socket.on('load-document', (c) => {
-        try {
-            if (c?.length) Y.applyUpdate(ydoc, new Uint8Array(c));
-            if (!binding) binding = new QuillBinding(ytext, quill);
-            setStatus('Đã tải tài liệu', 'bi-check2-circle');
-        } catch(e) { console.error(e); }
-    });
-    let saveTimer;
-    ydoc.on('update', (u, origin) => {
-        if (origin !== socket) { clearTimeout(saveTimer); saveTimer = setTimeout(() => setStatus('Đã lưu', 'bi-check-all'), 2500); }
-    });
-
-    // 6. Online users
-    socket.on('update-users', (users) => {
-        document.getElementById('user-list').innerHTML = users.map(e =>
-            `<div class="online-user-item">
-                <span class="online-dot"></span>
-                <span>${e === userEmail ? `<strong>${e} (Bạn)</strong>` : e}</span>
-             </div>`
-        ).join('') || `<span class="friend-empty">Không có ai</span>`;
-    });
-
-    // 7. Friends
-    socket.on('friend:request',  ({ senderEmail }) => { showToast(`🤝 ${senderEmail} muốn kết bạn!`); loadPendingRequests(); });
-    socket.on('friend:accepted', ({ accepterEmail }) => { showToast(`✅ ${accepterEmail} đã chấp nhận!`); loadFriendList(); });
-    socket.on('friend:presence', ({ userId, isOnline }) => {
-        document.querySelectorAll(`.friend-status[data-uid="${userId}"]`).forEach(el => {
-            el.textContent = isOnline ? '● Online' : '○ Offline';
-            el.className = `friend-status ${isOnline ? 'status-online' : 'status-offline'}`;
-        });
-        loadFriendList();
-    });
-
-    document.getElementById('btn-friend-search').onclick = searchUsers;
-    document.getElementById('friend-search-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchUsers(); });
-
-    async function searchUsers() {
-        const q = document.getElementById('friend-search-input').value.trim();
-        const ul = document.getElementById('search-results');
-        if (!q) { ul.innerHTML=''; return; }
-        const res = await apiFetch(`/api/users/search?q=${encodeURIComponent(q)}`);
-        if (!res.ok) { const d=await res.json(); showToast(d.error||'Lỗi',true); return; }
-        const users = await res.json();
-        ul.innerHTML = '';
-        if (!users.length) { ul.innerHTML=`<li class="friend-empty">Không tìm thấy</li>`; return; }
-        users.forEach(u => {
-            let action;
-            if      (u.friendship_status==='accepted')                                       action=`<span class="friend-tag tag-friend">Bạn bè</span>`;
-            else if (u.friendship_status==='pending' && u.requester_id===myUserId)           action=`<span class="friend-tag tag-sent">Đã gửi</span>`;
-            else if (u.friendship_status==='pending' && u.requester_id!==myUserId)           action=`<button class="btn-fa-accept" onclick="acceptFriend(${u.friendship_id},this)">✓</button>`;
-            else                                                                              action=`<button class="btn-fa-add" onclick="sendFriendRequest('${u.id}',this)">+ Kết bạn</button>`;
-            const li=document.createElement('li'); li.className='friend-item';
-            li.innerHTML=`
-                <div class="friend-avatar">${u.email[0].toUpperCase()}</div>
-                <div class="friend-info"><span class="friend-email" title="${u.email}">${u.email}</span></div>
-                <div class="friend-actions">${action}</div>`;
-            ul.appendChild(li);
-        });
-    }
-
-    window.sendFriendRequest = async (receiverId, btn) => {
-        btn.disabled=true; btn.textContent='…';
-        const res=await apiFetch('/api/friends/request',{method:'POST',body:JSON.stringify({receiverId})});
-        const d=await res.json();
-        if(res.ok){btn.textContent='Đã gửi';btn.className='friend-tag tag-sent';showToast('✉️ Đã gửi lời mời!');}
-        else{btn.disabled=false;btn.textContent='+ Kết bạn';showToast(d.error||'Lỗi',true);}
-    };
-    window.acceptFriend = async (id, btn) => {
-        btn.disabled=true;
-        const res=await apiFetch(`/api/friends/${id}/accept`,{method:'PATCH'});
-        if(res.ok){showToast('🎉 Đã kết bạn!');loadPendingRequests();loadFriendList();document.getElementById('search-results').innerHTML='';document.getElementById('friend-search-input').value='';}
-        else{btn.disabled=false;showToast('Lỗi',true);}
-    };
-    window.declineFriend = async (id, li) => {
-        const res=await apiFetch(`/api/friends/${id}/decline`,{method:'PATCH'});
-        if(res.ok){li.remove();loadPendingRequests();}
-    };
-
-    async function loadPendingRequests() {
-        const res=await apiFetch('/api/friends/pending'); if(!res.ok) return;
-        const p=await res.json();
-        const badge=document.getElementById('pending-badge'); const label=document.getElementById('pending-label');
-        badge.textContent=p.length; badge.classList.toggle('hidden',p.length===0); label.style.display=p.length?'block':'none';
-        const ul=document.getElementById('pending-list'); ul.innerHTML='';
-        p.forEach(x=>{
-            const li=document.createElement('li'); li.className='friend-item';
-            li.innerHTML=`
-                <div class="friend-avatar">${x.requester_email[0].toUpperCase()}</div>
-                <div class="friend-info"><span class="friend-email">${x.requester_email}</span></div>
-                <div class="friend-actions">
-                    <button class="btn-fa-accept" onclick="acceptFriend(${x.friendship_id},this)">✓</button>
-                    <button class="btn-fa-decline" onclick="declineFriend(${x.friendship_id},this.closest('li'))">✕</button>
-                </div>`;
-            ul.appendChild(li);
-        });
-    }
-
-    async function loadFriendList() {
-        const res=await apiFetch('/api/friends'); if(!res.ok) return;
-        const friends=await res.json();
-        const ul=document.getElementById('friend-list'); ul.innerHTML='';
-        if(!friends.length){ul.innerHTML=`<li class="friend-empty">Chưa có bạn bè nào</li>`;return;}
-        friends.forEach(f=>{
-            const invBtn=(f.is_online && docId)
-                ?`<button class="btn-fa-invite" data-action="invite-to-doc" data-friend-id="${f.friend_id}" title="Mời vào tài liệu">
-                    <i class="bi bi-envelope-plus"></i></button>`:'';
-            const li=document.createElement('li'); li.className='friend-item'; li.dataset.friendId=f.friend_id;
-            li.innerHTML=`
-                <div class="friend-avatar">${f.friend_email[0].toUpperCase()}</div>
-                <div class="friend-info">
-                    <span class="friend-email" title="${f.friend_email}">${f.friend_email}</span>
-                    <span class="friend-status ${f.is_online?'status-online':'status-offline'}" data-uid="${f.friend_id}">
-                        ${f.is_online?'● Online':'○ Offline'}
-                    </span>
-                </div>
-                <div class="friend-actions">
-                    ${invBtn}
-                    <button class="btn-fa-unfriend" data-action="unfriend" data-friendship-id="${f.friendship_id}" title="Hủy kết bạn">
-                        <i class="bi bi-x-lg"></i></button>
-                </div>`;
-            ul.appendChild(li);
-        });
-    }
-
-    document.getElementById('friend-list').addEventListener('click', async (e) => {
-        const btn=e.target.closest('[data-action]'); if(!btn) return;
-        if(btn.dataset.action==='invite-to-doc'){
-            const friendId=btn.dataset.friendId;
-            if(!docId){showToast('Bạn chưa mở tài liệu nào',true);return;}
-            btn.disabled=true; btn.innerHTML='<i class="bi bi-hourglass-split"></i>';
-            socket.emit('doc:invite-friend',{docId,friendId});
-            setTimeout(()=>{btn.disabled=false;btn.innerHTML='<i class="bi bi-envelope-plus"></i>';},3000);
-        }
-        if(btn.dataset.action==='unfriend'){
-            const li=btn.closest('li'); if(!confirm('Hủy kết bạn?')) return;
-            const res=await apiFetch(`/api/friends/${btn.dataset.friendshipId}`,{method:'DELETE'});
-            if(res.ok){li.remove();showToast('Đã hủy kết bạn');}
-        }
-    });
-
-    // 8. Doc invite
-    socket.on('doc:invite-sent',     ({docTitle})       => { showToast(`📨 Đã gửi lời mời vào "${docTitle}"`); document.querySelectorAll('[data-action="invite-to-doc"]').forEach(b=>{b.disabled=false;b.innerHTML='<i class="bi bi-envelope-plus"></i>';}); });
-    socket.on('doc:invite-error',    (msg)              => { showToast(msg,true); document.querySelectorAll('[data-action="invite-to-doc"]').forEach(b=>{b.disabled=false;b.innerHTML='<i class="bi bi-envelope-plus"></i>';}); });
-    socket.on('doc:invite-accepted', ({accepterEmail})  => showToast(`✅ ${accepterEmail} đã tham gia!`));
-    socket.on('doc:invite-received', ({docId:id,docTitle,inviterEmail,inviterId}) => showDocInvitePopup({docId:id,docTitle,inviterEmail,inviterId}));
-    socket.on('doc:invite-join',     ({docId:id})       => { window.location.href=`?id=${id}`; });
-
-    function showDocInvitePopup({docId:invDocId,docTitle,inviterEmail,inviterId}){
-        document.getElementById('doc-invite-popup')?.remove();
-        const popup=document.createElement('div'); popup.id='doc-invite-popup'; popup.className='doc-invite-popup';
-        popup.innerHTML=`
-            <div class="doc-invite-card">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-envelope-open-fill text-primary fs-5"></i>
-                    <strong style="font-size:13px;">Lời mời cộng tác</strong>
-                </div>
-                <p style="font-size:12px;color:#495057;margin-bottom:12px;">
-                    <strong>${inviterEmail}</strong> mời bạn vào:<br>
-                    <em class="text-primary">"${docTitle}"</em>
-                </p>
-                <div class="d-flex gap-2">
-                    <button id="doc-invite-accept" class="btn btn-success btn-sm flex-fill">
-                        <i class="bi bi-check-lg me-1"></i>Tham gia</button>
-                    <button id="doc-invite-decline" class="btn btn-outline-secondary btn-sm flex-fill">Từ chối</button>
-                </div>
-            </div>`;
-        document.body.appendChild(popup);
-        document.getElementById('doc-invite-accept').onclick  = () => { socket.emit('doc:invite-accept',{docId:invDocId,inviterId}); popup.remove(); };
-        document.getElementById('doc-invite-decline').onclick = () => popup.remove();
-        setTimeout(()=>popup.remove(), 30000);
-    }
-
-    // 9. Tabs
-    document.querySelectorAll('.rp-tab').forEach(tab => {
-        tab.addEventListener('click',()=>{
-            document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));
-            tab.classList.add('active');
-            const target=tab.dataset.tab;
-            document.getElementById('tab-online').classList.toggle('hidden',target!=='online');
-            document.getElementById('tab-friends').classList.toggle('hidden',target!=='friends');
-            if(target==='friends'){loadFriendList();loadPendingRequests();}
-        });
-    });
-
-    // 10. Buttons
-    document.getElementById('btn-create-doc').onclick = async () => {
-        const title=prompt('Đặt tên tài liệu mới:','Tài liệu mới'); if(title===null) return;
-        const res=await apiFetch('/api/documents',{method:'POST',body:JSON.stringify({title:title.trim()||'Tài liệu mới'})});
-        const doc=await res.json();
-        if(!res.ok){showToast(doc.error||'Lỗi',true);return;}
-        alert(`✅ Tạo thành công!\nMã mời: ${doc.invite_code}`);
-        window.location.search=`?id=${doc.id}`;
-    };
-    document.getElementById('btn-join-doc').onclick = async () => {
-        const code=prompt('Nhập mã mời:'); if(!code?.trim()) return;
-        const res=await apiFetch('/api/documents/join',{method:'POST',body:JSON.stringify({inviteCode:code.trim()})});
-        const data=await res.json();
-        res.ok ? (window.location.search=`?id=${data.id}`) : showToast(data.error||'Mã không hợp lệ',true);
-    };
-
-    // 11. Header
-    document.getElementById('auth-section').innerHTML=`
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-secondary" style="font-size:11px;font-weight:500;">
-                <i class="bi bi-person-fill me-1"></i>${userEmail||''}
-            </span>
-            <button id="btn-logout" class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-box-arrow-right me-1"></i>Thoát
-            </button>
-        </div>`;
-    document.getElementById('btn-logout').onclick = () => { localStorage.clear(); window.location.href='login.html'; };
-</script>
 </body>
 </html>

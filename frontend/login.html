@@ -4,178 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập — CES</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #e0eaff 0%, #f0e6ff 100%);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .auth-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.10);
-            padding: 40px 36px;
-            width: 100%;
-            max-width: 380px;
-        }
-        .auth-brand {
-            font-size: 1.6rem; font-weight: 800; color: #0d6efd; letter-spacing: -1px;
-            display: flex; align-items: center; gap: 8px; justify-content: center;
-            margin-bottom: 4px;
-        }
-        .auth-sub { text-align: center; color: #6c757d; font-size: 13px; margin-bottom: 24px; }
-
-        .auth-tab-bar {
-            display: flex; background: #f1f3f5; border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 20px;
-        }
-        .auth-tab {
-            flex: 1; padding: 7px; border: none; background: transparent;
-            border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
-            color: #6c757d; transition: all .2s;
-        }
-        .auth-tab.active { background: #fff; color: #0d6efd; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-
-        .form-control { font-size: 14px; padding: 10px 12px; }
-        .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
-
-        .btn-auth {
-            width: 100%; padding: 11px; font-size: 15px; font-weight: 600;
-            border-radius: 8px; margin-top: 4px;
-        }
-        .auth-switch { text-align: center; margin-top: 18px; font-size: 13px; color: #6c757d; }
-        .auth-switch a { color: #0d6efd; font-weight: 600; text-decoration: none; }
-        .auth-switch a:hover { text-decoration: underline; }
-    </style>
+    <!-- CSS chung của ứng dụng -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<div class="auth-card">
-    <div class="auth-brand">
-        <i class="bi bi-file-earmark-text-fill"></i>CES
+<body class="auth-page">
+
+    <div class="auth-card">
+        <!-- Thương hiệu -->
+        <div class="auth-brand">
+            <i class="bi bi-file-earmark-text-fill"></i>CES
+        </div>
+        <p class="auth-sub">Hệ thống soạn thảo cộng tác</p>
+
+        <!-- Tab chuyển đổi Đăng nhập / Đăng ký -->
+        <div class="auth-tab-bar">
+            <button class="auth-tab active" id="tab-login">Đăng nhập</button>
+            <button class="auth-tab"        id="tab-register">Đăng ký</button>
+        </div>
+
+        <!-- Form -->
+        <form id="auth-form" novalidate>
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:13px;">Email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" id="email" class="form-control"
+                           placeholder="example@email.com"
+                           required autocomplete="email">
+                </div>
+            </div>
+
+            <!-- Mật khẩu -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:13px;">Mật khẩu</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" id="password" class="form-control"
+                           placeholder="Tối thiểu 6 ký tự"
+                           required minlength="6" autocomplete="current-password">
+                </div>
+            </div>
+
+            <!-- Nhập lại mật khẩu (chỉ hiện khi Đăng ký) -->
+            <div class="mb-3" id="confirm-group" style="display:none;">
+                <label class="form-label fw-semibold" style="font-size:13px;">Nhập lại mật khẩu</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" id="confirm-password" class="form-control"
+                           placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+                </div>
+            </div>
+
+            <!-- Thông báo lỗi / thành công -->
+            <div id="alert-box" class="alert py-2 px-3" style="font-size:13px;display:none;"></div>
+
+            <!-- Nút submit -->
+            <button type="submit" class="btn btn-primary btn-auth" id="submit-btn">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Vào Trình Soạn Thảo
+            </button>
+        </form>
+
+        <!-- Chuyển mode -->
+        <p class="auth-switch">
+            Chưa có tài khoản? <a href="#" id="toggle-mode">Đăng ký ngay</a>
+        </p>
     </div>
-    <p class="auth-sub">Hệ thống soạn thảo cộng tác</p>
 
-    <div class="auth-tab-bar">
-        <button class="auth-tab active" id="tab-login">Đăng nhập</button>
-        <button class="auth-tab"        id="tab-register">Đăng ký</button>
-    </div>
-
-    <form id="auth-form" novalidate>
-        <div class="mb-3">
-            <label class="form-label fw-semibold" style="font-size:13px;">Email</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" id="email" class="form-control" placeholder="example@email.com" required autocomplete="email">
-            </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-semibold" style="font-size:13px;">Mật khẩu</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" id="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required minlength="6" autocomplete="current-password">
-            </div>
-        </div>
-        <div class="mb-3" id="confirm-group" style="display:none;">
-            <label class="form-label fw-semibold" style="font-size:13px;">Nhập lại mật khẩu</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                <input type="password" id="confirm-password" class="form-control" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
-            </div>
-        </div>
-
-        <div id="alert-box" class="alert py-2 px-3" style="font-size:13px;display:none;"></div>
-
-        <button type="submit" class="btn btn-primary btn-auth" id="submit-btn">
-            <i class="bi bi-box-arrow-in-right me-1"></i>Vào Trình Soạn Thảo
-        </button>
-    </form>
-
-    <p class="auth-switch">
-        Chưa có tài khoản? <a href="#" id="toggle-mode">Đăng ký ngay</a>
-    </p>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let isLogin = true;
-
-    const tabLogin    = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
-    const toggleLink  = document.getElementById('toggle-mode');
-    const confirmGrp  = document.getElementById('confirm-group');
-    const confirmInp  = document.getElementById('confirm-password');
-    const submitBtn   = document.getElementById('submit-btn');
-    const alertBox    = document.getElementById('alert-box');
-
-    function showAlert(msg, type = 'danger') {
-        alertBox.className = `alert alert-${type} py-2 px-3`;
-        alertBox.style.display = 'block';
-        alertBox.innerHTML = msg;
-    }
-    function hideAlert() { alertBox.style.display = 'none'; }
-
-    function switchMode(login) {
-        isLogin = login;
-        hideAlert();
-        tabLogin.classList.toggle('active', login);
-        tabRegister.classList.toggle('active', !login);
-        confirmGrp.style.display = login ? 'none' : 'block';
-        confirmInp.required = !login;
-        submitBtn.innerHTML = login
-            ? '<i class="bi bi-box-arrow-in-right me-1"></i>Vào Trình Soạn Thảo'
-            : '<i class="bi bi-person-plus me-1"></i>Tạo Tài Khoản';
-        document.getElementById('password').autocomplete = login ? 'current-password' : 'new-password';
-    }
-
-    tabLogin.onclick    = () => switchMode(true);
-    tabRegister.onclick = () => switchMode(false);
-    toggleLink.onclick  = (e) => { e.preventDefault(); switchMode(!isLogin); };
-
-    document.getElementById('auth-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideAlert();
-
-        const email    = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const confirm  = confirmInp.value;
-
-        if (!isLogin && password !== confirm) { showAlert('Mật khẩu nhập lại không khớp.'); return; }
-        if (!isLogin && password.length < 6)  { showAlert('Mật khẩu phải có ít nhất 6 ký tự.'); return; }
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
-
-        try {
-            const response = await fetch(`http://localhost:5000${isLogin ? '/auth/login' : '/auth/register'}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                if (isLogin) {
-                    localStorage.setItem('ces_token', data.token);
-                    localStorage.setItem('ces_email', email);
-                    window.location.href = 'index.html';
-                } else {
-                    switchMode(true);
-                    document.getElementById('password').value = '';
-                    showAlert('<i class="bi bi-check-circle me-1"></i>Đăng ký thành công! Hãy đăng nhập.', 'success');
-                }
-            } else {
-                showAlert(data.error || data.message || 'Đã có lỗi xảy ra.');
-            }
-        } catch {
-            showAlert('<i class="bi bi-wifi-off me-1"></i>Không thể kết nối đến server!');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = isLogin
-                ? '<i class="bi bi-box-arrow-in-right me-1"></i>Vào Trình Soạn Thảo'
-                : '<i class="bi bi-person-plus me-1"></i>Tạo Tài Khoản';
-        }
-    });
-</script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Logic đăng nhập / đăng ký -->
+    <script src="login.js"></script>
 </body>
 </html>
