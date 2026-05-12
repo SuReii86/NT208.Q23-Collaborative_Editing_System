@@ -1,3 +1,24 @@
+# 👥 Collaborative Editing System (CES)
+
+Hệ thống soạn thảo văn bản cộng tác thời gian thực với đồng bộ CRDT và Socket.IO.
+
+`REALTIME` `SOCKET.IO` `YJS CRDT` `POSTGRESQL` `JWT AUTH`
+
+---
+
+
+- 🏗️ **Thiết kế hệ thống:** Phân tích yêu cầu, xây dựng kiến trúc Client-Server và luồng xử lý realtime
+
+- 🔄 **Triển khai đồng bộ dữ liệu:** Tích hợp Yjs CRDT và Socket.IO để hỗ trợ chỉnh sửa tài liệu đồng thời theo thời gian thực
+
+- 🔐 **Xây dựng Authentication & Security:** Triển khai JWT Authentication, bcrypt hashing và Rate Limiting chống brute-force
+
+- 💾 **Quản lý lưu trữ dữ liệu:** Thiết kế schema PostgreSQL, cơ chế snapshot và khôi phục trạng thái tài liệu
+
+- 👥 **Phát triển tính năng cộng tác:** Xây dựng hệ thống bạn bè, presence online và realtime document invitation
+
+- 📄 **Tài liệu & vận hành:** Viết runbook triển khai, hướng dẫn cấu hình và xử lý sự cố hệ thống
+
 # 🚀 Runbook - Hướng dẫn Triển khai & Vận hành Hệ thống Soạn thảo Cộng tác (CES)
 
 Runbook này cung cấp hướng dẫn toàn diện để khởi tạo, cấu hình, vận hành và xử lý sự cố cho dự án **CES (Collaborative Editing System)**.
