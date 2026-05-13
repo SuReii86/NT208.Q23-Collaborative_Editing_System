@@ -10,8 +10,9 @@ import * as Y from 'https://esm.sh/yjs@13.6.15';
 import { QuillBinding } from 'https://esm.sh/y-quill@0.1.5?deps=yjs@13.6.15';
 import Quill from 'https://esm.sh/quill@1.3.7';
 
-const API_BASE = 'http://localhost:5000';
-
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : 'https://nt208uit.shop';
 
 // 1. AUTH & THÔNG TIN NGƯỜI DÙNG
 const token     = localStorage.getItem('ces_token');
