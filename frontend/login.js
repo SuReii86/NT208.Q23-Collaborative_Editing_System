@@ -3,7 +3,9 @@
  * Xử lý logic đăng nhập và đăng ký tài khoản
  */
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : 'https://nt208uit.shop';
 
 
 // Tham chiếu DOM (Document Object Model)
