@@ -212,11 +212,25 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
         if (!isValidUUID(id)) return res.status(400).json({ error: 'ID tài liệu không hợp lệ' });
-        const result = await pool.query(
-            'DELETE FROM documents WHERE id = $1 AND owner_id = $2 RETURNING id',
+
+        // Kiểm tra quyền owner trước
+        const ownerCheck = await pool.query(
+            'SELECT id FROM documents WHERE id = $1 AND owner_id = $2',
             [id, req.user.userId]
         );
-        if (result.rows.length === 0) return res.status(403).json({ error: 'Bạn không có quyền xóa tài liệu này' });
+        if (ownerCheck.rows.length === 0) {
+            return res.status(403).json({ error: 'Bạn không có quyền xóa tài liệu này' });
+        }
+
+        // Xóa snapshot trước (tránh foreign key violation)
+        await pool.query('DELETE FROM document_snapshots WHERE document_id = $1', [id]);
+
+        // Xóa các collaborator
+        await pool.query('DELETE FROM document_collaborators WHERE document_id = $1', [id]);
+
+        // Cuối cùng mới xóa document
+        await pool.query('DELETE FROM documents WHERE id = $1', [id]);
+
         res.json({ message: 'Đã xóa tài liệu thành công' });
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -97,7 +97,7 @@ async function loadDocumentList() {
                             ? `<button onclick="event.stopPropagation();startRename('${doc.id}',this)"
                                     data-title="${doc.title||''}" title="Đổi tên">
                                     <i class="bi bi-pencil"></i></button>
-                               <button data-action="leave-doc" data-doc-id="${doc.id}"
+                               <button data-action="delete-doc" data-doc-id="${doc.id}"
                                     title="Xóa tài liệu" style="color:#dc3545;">
                                     <i class="bi bi-trash"></i></button>`
                             : `<button data-action="leave-doc" data-doc-id="${doc.id}"
@@ -135,6 +135,21 @@ document.getElementById('doc-list').addEventListener('click', async (e) => {
                 : loadDocumentList();
         } else {
             showToast(data.error || 'Không thể rời tài liệu', true);
+        }
+        return;
+    }
+    const deleteBtn = e.target.closest('[data-action="delete-doc"]');
+    if (deleteBtn) {
+        e.stopPropagation();
+        const id = deleteBtn.dataset.docId;
+        if (!confirm('Xóa tài liệu này vĩnh viễn?')) return;
+        const res = await apiFetch(`/api/documents/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+            showToast('Đã xóa tìa liệu');
+            id === docId ? (window.location.href = 'index.html') : loadDocumentList();
+        } else {
+            showToast(data.error || 'Không thể xóa tài liệu', true);
         }
         return;
     }
